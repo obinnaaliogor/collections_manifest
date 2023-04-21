@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: javaapppod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: javaapp2
+  template:
+    metadata:
+      name: javaapppod
+      labels:
+        app: javaapp2
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - us-east-1a
+      containers:
+      - name: with-node-affinity
+        image: obinnaaliogor/java-web-app
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: javaapppodsvc 
+spec:
+  selector:
+    app: javaapp2
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 8080

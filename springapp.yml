@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  springapp
+  labels:
+    name:  springapp
+spec:
+  selector:
+    matchLabels:
+      app: twitter
+  replicas: 2
+  template:
+    metadata:
+      name: springapp
+      labels:
+        app: twitter
+    spec:
+      containers:
+      - name: springapp
+        image: obinnaaliogor/spring-boot-nongo
+        resources:
+          requests:
+            cpu: "20m"
+            memory: "55M"
+          limits:
+            cpu: "20m"
+            memory: "55M"
+        env:
+        - name:  MONGO_DB_HOSTNAME
+          value: mongosvc    
+        - name:  MONGO_DB_USERNAME
+          value: obinna
+        - name: MONGO_DB_PASSWORD
+          value: obinna@123
+        ports:
+        - containerPort:  8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springappsvc
+spec:
+  selector:
+    app: twitter
+  type: NodePort
+  ports:
+  - port: 8002
+    targetPort: 8080
+   

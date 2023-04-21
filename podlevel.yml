@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-app
+spec:
+  selector:
+    matchLabels:
+      app: twitter
+  replicas: 2
+  template:
+  revisionHistoryLimit: 10
+  strategy:
+    type: Recreate
+  

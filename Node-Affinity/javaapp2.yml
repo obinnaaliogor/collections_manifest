@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: javawebapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: javawebapp
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 60
+  template:
+    metadata:
+      name: javawebapp
+      labels:
+        app: javawebapp
+    spec:
+      affinity:
+        nodeAffinity:
+         requiredDuringSchedulingIgnoredDuringExecution:
+           nodeSelectorTerms:
+           - matchExpressions:
+             - key: "name"
+               operator: In
+               values:
+               - workerOne
+             - key: "node"
+               operator: In
+               values:
+               - dbnode
+      containers:
+      - name: javawebapp
+        image: obinnaaliogor/java-web-app
+        ports:
+        - containerPort: 8080

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: springappconfig
+data:
+  db-username: obinna
+  db-hostname: mongosvc
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: springappsecret
+type: Opaque
+stringData:
+  db-password: obinna@123
+  # Example:
+  # password: {{ .Values.password | b64enc }}
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJkb2NrZXIuaW8iOnsidXNlcm5hbWUiOiJvYmlubmFhbGlvZ29yIiwicGFzc3dvcmQiOiJAQExvcmQwMDEiLCJhdXRoIjoiYjJKcGJtNWhZV3hwYjJkdmNqcEFRRXh2Y21Rd01ERT0ifX19
+kind: Secret
+metadata:
+  creationTimestamp: "2023-02-07T05:38:12Z"
+  name: dockerhublogin
+  namespace: dev
+  resourceVersion: "189911"
+  uid: ed1e6635-2827-41bc-892f-60ccea242f9f
+type: kubernetes.io/dockerconfigjson
