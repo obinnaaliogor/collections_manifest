@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mongoapp
+  labels:
+    app: mongoapp
+spec:
+  # modify replicas according to your case
+  selector:
+    matchLabels:
+      app: mongoapp
+  template:
+    metadata:
+      name:  mongoapp
+      labels:
+        app: mongoapp
+    spec:
+      containers:
+      - name: mongocontainerapp
+        image: mongo
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: obinna
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: obinna@123
+        volumeMounts:
+        - name: mongodb-nfs-pv
+          mountPath: /data/db
+      volumes:
+      - name: mongodb-nfs-pv
+        persistentVolumeClaim:
+          claimName: pvc-nfs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongosvc
+spec:
+  selector:
+    app: mongoapp
+  ports:
+  - port: 27017
+    targetPort: 27017
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: manual
+  nfs: 
+    server: 10.0.0.29
+    path: "/mnt/share"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nfs
+spec:
+  storageClassName: manual
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  springapp
+  labels:
+    name:  springapp
+spec:
+  selector:
+    matchLabels:
+      app: twitter
+  replicas: 2
+  template:
+    metadata:
+      name: springapp
+      labels:
+        app: twitter
+    spec:
+      containers:
+      - name: springapp
+        image: obinnaaliogor/spring-boot-nongo
+        resources:
+          requests:
+            cpu: "20m"
+            memory: "55M"
+          limits:
+            cpu: "256m"
+            memory: "1000M"
+        env:
+        - name:  MONGO_DB_HOSTNAME
+          valueFrom:
+          configMapKeyRef:
+            name: springappconfig
+            key: db-hostname
+        - name:  MONGO_DB_USERNAME
+          valueFrom:
+          configMapKeyRef:
+            name: springappconfig
+            key: db-username
+        - name: MONGO_DB_PASSWORD
+          value: obinna@123
+        ports:
+        - containerPort:  8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springappsvc
+spec:
+  selector:
+    app: twitter
+  type: NodePort
+  ports:
+  - port: 8017
+    targetPort: 8080

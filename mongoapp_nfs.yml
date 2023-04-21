@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mongodbapprs
+  labels:
+    app: mongo
+spec:
+  # modify replicas according to your case
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      name:  mongodbapp
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongodbappcontainer
+        image: mongo
+        ports:
+        - containerPort:  27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: obinna
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: obinna@123
+        volumeMounts:
+        - name: mongodb-nfsvol
+          mountPath: /data/db
+      volumes:
+        - name: mongodb-nfsvol
+          nfs:
+            server: 10.0.0.29
+            path: /mnt/share
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongosvc
+spec:
+  selector:
+    app: mongo
+  ports:
+  - port: 27017
+    targetPort: 27017

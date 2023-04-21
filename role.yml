@@ -1,0 +1,26 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: readonly
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get","list","create","delete","update"]
+- apiGroups: ["apps"]
+  resources: ["deployments","replicasets","daemonsets"]
+  verbs: ["get","list"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: full_access_role_binding
+  namespace: default
+subjects:
+- kind: User
+  name: dominion                           # Map with username
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: readonly
+  apiGroup: rbac.authorization.k8s.io

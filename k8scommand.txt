@@ -1,0 +1,43 @@
+# To get the context you are currently using.
+
+- kubectl config current-context
+
+# To list all available contexts in your working(local environment). 
+
+- kubectl config get-contexts
+
+
+# To switch context, run the command below and pass the context name.
+
+- kubectl config use-context <context_name>
+....
+aws eks update-kubeconfig --name demo --region us-east-1. ---> Brings your cluster to your local env or any server.
+If you encounter an error that has to do with the v1alpha1 client API authenticator, follow the docs below;
+
+This is b/c
+v1alpha1 of the client authentication API was removed in the Kubernetes client in version 1.24. The latest release of this provider was updated to use 1.24 of the Kubernetes client Go modules, and 3.9 of the upstream Helm module. We know this seems like a breaking change but is expected as API versions marked alpha can be removed in minor releases of the Kubernetes project.
+
+The upstream helm Go module was also updated to use the 1.24 client in helm 3.9 so you will see this issue if you use the helm command directly with a kubeconfig that tries to use the v1alpha1 client authentication API.
+
+
+https://veducate.co.uk/eks-kubectl-commands-fail/
+https://github.com/hashicorp/terraform-provider-helm/issues/893
+aws <command> help
+
+aws eks get-token --cluster-name demo | jq '.apiVersion'
+"client.authentication.k8s.io/v1alpha1"
+
+..
+helm show chart <chartname>
+helm template demochart
+helm install <appname that you want to call the app> <chartname>
+kubectl get po
+helm upgrade ks8app demochart
+kubectl describe po ks8app-demochart-7867bfd4fd-8m5
+helm create demochart2
+helmfile --interactive apply --wait (This will apply your release in an interactive manner or it will delete the release if you passed <installed: false> in your helmfile configuration)
+
+helmfile sync (This will release all your definition in the helmfile configuration)
+helmfile logs release-name
+helmfile --debug --interactive apply --wait
+Using the --debug flag provides more detailed logging output, which can be helpful in troubleshooting issues with helmfile. In this case, it allowed you to see what was happening during the deployment process and find a solution to the issue you were facing.

@@ -1,0 +1,55 @@
+apiVersion: eksctl.io/v1alpha5
+
+kind: ClusterConfig
+
+metadata:
+
+  name: my-cluster
+
+  region: us-east-1
+
+  version: "1.24"
+
+availabilityZones: ["us-east-1a", "us-east-1b"]
+
+managedNodeGroups:
+
+- name: mynodegroup
+
+  desiredCapacity: 1
+
+  instanceType: t2.medium
+
+  ssh:
+
+    enableSsm: true
+
+  iam:
+
+    withAddonPolicies:
+
+      imageBuilder: true
+
+      autoscaler: true
+
+      externalDNS: true
+
+      certManager: true
+
+      ebs: true
+
+      albIngress: true
+
+      xRay: true
+
+iam:
+
+  withOIDC: true
+
+karpenter:
+
+  version: '0.26.1'
+
+secretsEncryption:
+
+  keyARN: arn:aws:kms:us-east-1:612500737416:key/245a976c-f538-4f1e-a53a-a0e59c6ae118

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongosvc
+spec:
+  clusterIP: None # Headless Service
+  selector:
+    app: mongod
+  ports:
+  - port: 27017
+    targetPort: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongod
+spec:
+  selector:
+    matchLabels:
+      app: mongod
+  serviceName: mongosvc
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: mongod
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mongodbcontainer
+        image: mongo
+        command:
+         - "mongod"
+         - "--bind_ip"
+         - "0.0.0.0"
+         - "--replSet"
+         - "MainRepSet"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 512m
+            memory: 500Mi
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongodb-persistent-storage-claim
+          mountPath: "/data/db"
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-persistent-storage-claim
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

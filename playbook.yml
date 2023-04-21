@@ -1,0 +1,35 @@
+-hosts: db
+ become: true  
+ tasks:
+ - name: install apache 
+  yum: name=httpd state=present 
+ - name: start apache
+   service: name=httpd state=start 
+ - name: copy index.html 
+   copy:
+     src: /home/ec2-user/index.html
+     dest: /var/www/html/
+
+-hosts: web
+ become: true  
+ tasks: 
+ - name: install apache 
+   package: name=httpd state=present 
+ - name: start apache 
+   service: name=httpd state=present 
+ - name: copy index.html 
+   copy: name=index.html src=/home/ec2-user/index.html dest=/var/www/html 
+  
+-hosts: all
+ tasks: 
+ - name: install vim 
+   #package: name=vim state=present 
+   package:
+     name: vim
+     state: present 
+
+-hosts: 
+ tasks:
+ - name: check system resources 
+   shell:
+     df -h 
